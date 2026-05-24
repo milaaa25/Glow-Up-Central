@@ -12,7 +12,6 @@ import Ingredients from './components/Ingredients'
 import JenisKulit from './components/JenisKulit'
 import Makeup from './components/Makeup'
 import Looks from './components/Looks'
-import Tutorial from './components/Tutorial'
 import Rutinitas from './components/Rutinitas'
 import Tips from './components/Tips'
 import Quiz from './components/Quiz'
@@ -56,7 +55,6 @@ function App() {
             <Route path="/jenis-kulit" element={<JenisKulit />} />
             <Route path="/makeup" element={<Makeup />} />
             <Route path="/looks" element={<Looks />} />
-            <Route path="/tutorial" element={<Tutorial />} />
             <Route path="/catalog/:categoryName" element={<ProductCatalog />} />
             <Route path="/detail/:id" element={<DetailLooks />} />
             <Route path="/rutinitas" element={<Rutinitas />} />

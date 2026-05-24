@@ -13,7 +13,7 @@ function FotoGrid() {
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(2, 1fr)',
-        gridTemplateRows: 'repeat(2, 400px)', // ubah tingginya sesuai selera
+        gridTemplateRows: 'repeat(2, 400px)',
       }}>
         {fotos.map((src, i) => (
           <div key={i} style={{ overflow: 'hidden' }}>

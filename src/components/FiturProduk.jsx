@@ -1,7 +1,7 @@
 import React from 'react'
 
 const gambar = [
-  '/images/foundi.jpg', // ganti nama filenya
+  '/images/foundi.jpg', 
   '/images/skin.jpg',
   '/images/swatch.jpg',
 ]
@@ -17,7 +17,7 @@ function FiturProduk() {
             alt={`foto ${i + 1}`}
             style={{
               width: '100%',
-              height: '500px',   // bisa diubah sesuai selera
+              height: '500px',   
               objectFit: 'cover',
               display: 'block',
             }}

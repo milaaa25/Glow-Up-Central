@@ -1,0 +1,33 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #fdf6f0;
+  color: #2c1a10;
+}
+
+.nav-link:hover {
+  background: #e8c5b5 !important;
+  color: #6b3e2e !important;
+  border-radius: 4px;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 40px rgba(107,62,46,0.13) !important;
+  transition: all 0.25s;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #d4876b;
+  box-shadow: 0 0 0 3px rgba(212,135,107,0.12);
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #fdf6f0; }
+::-webkit-scrollbar-thumb { background: #e8c5b5; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #6b3e2e; }
+
+@media (max-width: 768px) {
+  h1 { font-size: 2rem !important; }
+  h2 { font-size: 1.8rem !important; }
+}

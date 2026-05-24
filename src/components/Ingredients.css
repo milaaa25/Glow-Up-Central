@@ -1,0 +1,36 @@
+.kandungan-page { min-height: 100vh; }
+
+.ingredient-table { background: var(--white); border-radius: 20px; overflow-x: auto; box-shadow: 0 4px 24px rgba(59, 35, 20, 0.07); margin: 32px 0 48px; }
+.ingredient-table table { width: 100%; border-collapse: collapse; min-width: 600px; }
+.ingredient-table thead th { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); padding: 20px 24px; border-bottom: 1.5px solid var(--cream); background: var(--white); text-align: left; }
+.ingredient-table tbody tr { border-bottom: 1px solid #f0e8e0; transition: background 0.15s; }
+.ingredient-table tbody tr:hover { background: #fdf8f5; }
+.ingredient-table tbody tr:last-child { border-bottom: none; }
+.ingredient-table td { padding: 18px 24px; vertical-align: middle; font-size: 0.88rem; }
+.ing-name { font-weight: 500; font-size: 0.95rem; color: var(--brown); }
+.badge-status { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.06em; padding: 5px 14px; border-radius: 20px; display: inline-block; }
+.badge-aman { background: #e8f5e8; color: #2e7d32; }
+.badge-hati { background: #fff3e0; color: #e65100; }
+.badge-hindari { background: #fce4e4; color: #c62828; }
+.detail-grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; margin: 32px 0; }
+.ing-card { background: var(--white); border-radius: 18px; padding: 28px; height: 100%; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 2px 12px rgba(59, 35, 20, 0.06); }
+.ing-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(59, 35, 20, 0.1); }
+.ing-icon { font-size: 2.2rem; margin-bottom: 14px; }
+.ing-card-name { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 400; color: var(--brown); margin-bottom: 6px; }
+.ing-card-sub { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+.ing-tag { display: inline-block; font-size: 0.68rem; padding: 4px 10px; border-radius: 20px; margin: 3px 3px 3px 0; }
+.ing-desc { font-size: 0.83rem; color: var(--muted); line-height: 1.7; margin-bottom: 12px; }
+.ing-benefit { font-size: 0.8rem; color: var(--sage); font-weight: 500; }
+.tag-waktu-pagi { background: #fff8e1; color: #f57f17; }
+.tag-waktu-malam { background: #e8eaf6; color: #3949ab; }
+.tag-waktu-pagimalam { background: #e8f5e9; color: #2e7d32; }
+.combo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin: 20px 0 32px; }
+.combo-card { border-radius: 16px; padding: 24px; height: 100%; transition: transform 0.2s; }
+.combo-card:hover { transform: translateY(-2px); }
+.combo-ok { background: linear-gradient(135deg, #e8f5e8, #d4ecd4); border: 1.5px solid #b2d8b2; }
+.combo-no { background: linear-gradient(135deg, #fce4e4, #f5cccc); border: 1.5px solid #e8b0b0; }
+.combo-title { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 400; color: var(--brown); margin-bottom: 12px; }
+.combo-pair { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 0.85rem; flex-wrap: wrap; }
+.combo-pair .a, .combo-pair .b { background: rgba(255, 255, 255, 0.8); padding: 4px 12px; border-radius: 20px; font-weight: 500; color: var(--brown); }
+.combo-reason { font-size: 0.78rem; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+.combo-section-title { font-family: 'Cormorant Garamond', serif; margin-bottom: 16px; }

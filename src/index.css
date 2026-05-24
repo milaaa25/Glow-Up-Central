@@ -1,0 +1,38 @@
+:root {
+  --pink-main: #c4826a;
+  --pink-deep: #6b3e2e;
+  --pink-soft: #d4876b;
+  --pink-light: #e8c5b5;
+  --pink-pale: #fdf6f0;
+  --pink-dark: #4a2e1e;
+  --text-body: #5a4a42;
+  --text-muted: #9b7e70;
+
+  --night: #1a0f0a;
+  --white: #ffffff;
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  background: #fdf6f0;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+#root {
+  width: 100%;
+  overflow-x: hidden;
+}
+

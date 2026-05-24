@@ -1,0 +1,89 @@
+main {
+  background-color: #fdf6f0 !important; /* Mengubah background putih layar jadi cream pastel sangat lembut */
+}
+.look-detail-section {
+  background: #ffffff !important; /* Kotak atas dibuat putih bersih biar kontras dengan BG kuning luar */
+  border-radius: 24px !important;
+  padding: 40px !important;
+  margin-bottom: 50px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
+}
+.detail-image-wrapper {
+  background: #fffffe !important;
+  border: 1px solid #6b3e2e!important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02) !important;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease !important;
+}
+
+.detail-image-wrapper:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06) !important;
+}
+
+.card-color-header {
+  height: 180px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  position: relative !important;
+  padding: 20px !important;
+  transition: all 0.3s ease !important;
+}
+
+/* ==========================================
+   WARNA GRADASI PASTEL (SINKRON GAMBAR CONTOH)
+   ========================================== */
+
+.bg-gradient-foundation {
+  background: linear-gradient(180deg, #fcece6 0%, #e89873 100%) !important;
+}
+
+.bg-gradient-lips {
+  background: linear-gradient(180deg, #fde4ec 0%, #e67fa4 100%) !important;
+}
+
+.bg-gradient-eyes {
+  background: linear-gradient(180deg, #eceeff 0%, #a2a6f5 100%) !important;
+}
+
+/* ==========================================
+   TAMPILAN ISI TEKS BAWAH (CLEAN DESIGN)
+   ========================================== */
+.card-body-content {
+  padding: 20px !important;
+  text-align: left !important;
+  background: #ffffff !important;
+}
+
+.product-badge-label {
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1.5px !important;
+  color: #c2a091 !important;
+  font-weight: 600 !important;
+  margin-bottom: 6px !important;
+  display: block !important;
+}
+
+.card-item-link {
+  background-color: #f9f9f9 !important;
+  color: #4a4a4a !important;
+  padding: 10px 14px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border: 1px solid #efefef !important;
+  transition: all 0.25s ease-in-out !important;
+  text-align: left !important;
+  cursor: pointer;
+  width: 100%;
+}
+
+.card-item-link:hover {
+  background-color: #f5ece8 !important;
+  color: #6b3e2e !important;
+  border-color: #e8c5b5 !important;
+  transform: translateX(4px) !important;
+}

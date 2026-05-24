@@ -1,0 +1,104 @@
+.looks-page {
+  background-color: #fdf6f0 !important;
+  min-height: 100vh;
+  padding-top: 100px;
+  padding-bottom: 5rem;
+}
+
+.inspiration-card {
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.inspiration-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(107, 62, 46, 0.1) !important;
+}
+
+.card-img-hover {
+  transition: transform 0.5s ease;
+}
+
+.inspiration-card:hover .card-img-hover {
+  transform: scale(1.05);
+}
+
+.rounded-pill {
+  transition: background-color 0.3s ease;
+}
+
+.card,
+.product-card {
+  background-color: #ffffff !important;
+  border: 1px solid #e8c5b5 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 20px rgba(107, 62, 46, 0.05) !important;
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease !important;
+}
+
+.card:hover,
+.product-card:hover {
+  transform: translateY(-8px) !important;
+  box-shadow: 0 16px 35px rgba(107, 62, 46, 0.13) !important;
+  border-color: #d4876b !important;
+}
+
+.card img,
+.product-card img {
+  transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+  object-fit: cover !important;
+}
+
+.card:hover img,
+.product-card:hover img {
+  transform: scale(1.04) !important;
+}
+
+.card-body {
+  padding: 24px !important;
+  text-align: left !important;
+  background: #ffffff !important;
+}
+
+.card-title,
+.card h3 {
+  font-family: 'Georgia', serif !important;
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  color: #6b3e2e !important;
+  margin-bottom: 0.5rem !important;
+  line-height: 1.4 !important;
+}
+
+.card-text,
+.card p {
+  font-size: 0.82rem !important;
+  color: #9b7e70 !important;
+  line-height: 1.7 !important;
+  margin-bottom: 1rem !important;
+  text-align: left !important;
+}
+
+.card-body button,
+.card-body .btn {
+  background-color: transparent !important;
+  color: #6b3e2e !important;
+  border: 1px solid #e8c5b5 !important;
+  border-radius: 20px !important;
+  padding: 8px 24px !important;
+  font-size: 0.8rem !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.05em !important;
+  transition: all 0.2s ease !important;
+  width: 100% !important;
+}
+
+.card-body button:hover,
+.card-body .btn:hover {
+  background-color: #6b3e2e !important;
+  color: white !important;
+  border-color: #6b3e2e !important;
+  box-shadow: 0 6px 15px rgba(107, 62, 46, 0.2) !important;
+  transform: translateY(-1px) !important;
+}

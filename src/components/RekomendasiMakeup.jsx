@@ -6,23 +6,29 @@ function RekomendasiMakeup() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        await axios.get('https://fakestoreapi.com/products?limit=20')
-        const localData = await import('../data/products.json')
-        const makeup = localData.default.filter(p => p.category === 'makeup').slice(0, 6)
-        setProducts(makeup)
-      } catch (err) {
-        setError('Gagal memuat produk.')
-      } finally {
-        setLoading(false)
-      }
+ useEffect(() => {
+  const fetchProducts = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await axios.get('https://jsonplaceholder.typicode.com/photos?_limit=20')
+      const localData = await import('../data/products.json')
+      const makeup = localData.default
+        .filter(p => p.category === 'makeup')
+        .slice(0, 6)
+        .map((p, i) => ({
+          ...p,
+          apiId: res.data[i]?.id, 
+        }))
+      setProducts(makeup)
+    } catch (err) {
+      setError('Gagal memuat produk.')
+    } finally {
+      setLoading(false)
     }
-    fetchProducts()
-  }, [])
+  }
+  fetchProducts()
+}, [])
 
   const getRecommendationTag = (rating) => {
     if (rating >= 4.8) return '⭐ Top Rated'

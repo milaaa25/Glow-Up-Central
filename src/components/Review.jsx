@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from '../api';
 
 const C = {
   cream: "#fdf6f0", soft: "#f3e8e0", rose: "#e8c5b5",
@@ -89,12 +89,18 @@ export default function Review() {
   const PER_PAGE = 6;
 
   useEffect(() => {
-    // Mengambil data dari Public API JSONPlaceholder /users (minimal 10 item)
-    // Id dari API digunakan untuk membuat chip filter bintang (1-5)
-    axios.get('https://jsonplaceholder.typicode.com/users?_limit=10')
+    api.get('/reviews')
       .then((res) => {
-        // Transform: 1 chip per bintang (5 chip), sisanya diabaikan
         const STAR_LEVELS = [5, 4, 3, 2, 1];
+
+        // Guard: kalau review dari backend kurang dari 5, jangan bikin chip
+        // (biar gak crash akses res.data[i] yang undefined)
+        if (!res.data || res.data.length < STAR_LEVELS.length) {
+          setApiReviewers([]);
+          return;
+        }
+
+        // Transform: 1 chip per bintang (5 chip), sisanya diabaikan
         const chips = STAR_LEVELS.map((star, i) => ({
           id:    res.data[i].id,
           star:  star,
@@ -102,7 +108,9 @@ export default function Review() {
         }));
         setApiReviewers(chips);
       })
-      .catch(() => {})
+      .catch((err) => {
+        console.error('Gagal memuat reviews dari backend:', err);
+      })
       .finally(() => setLoading(false));
   }, []);
 

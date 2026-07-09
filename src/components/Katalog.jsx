@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import api from "../api";
 
 const C = {
   cream: "#fdf6f0", soft: "#f3e8e0", rose: "#e8c5b5",
@@ -8,256 +9,6 @@ const C = {
 const font = {
   serif: "'Cormorant Garamond', serif",
   sans: "'DM Sans', sans-serif",
-};
-
-
-const PRODUCTS_DB = {
-  makeup: [
-    {
-      id: 1,
-      name: "Velvet Matte Lipstick",
-      brand: "GLŌW Lips",
-      price: "Rp 89.000",
-      desc: "Lipstik matte tahan lama dengan formula nyaman, tersedia 12 shade elegan.",
-      emoji: "",
-      image: "/images/Velvet Matte Lipstick.jpg",
-      badge: "Bestseller",
-    },
-    {
-      id: 2,
-      name: "Water Stain Lip Tint",
-      brand: "GLŌW Lips",
-      price: "Rp 65.000",
-      desc: "Lip tint cair berbasis air, hasil natural ombre yang ringan di bibir.",
-      emoji: "",
-      image: "/images/Water Stain Lip Tint.jpg",
-      badge: null,
-    },
-    {
-      id: 3,
-      name: "Cushion Foundation Pro",
-      brand: "GLŌW Base",
-      price: "Rp 175.000",
-      desc: "Coverage medium-full, SPF40, formula hydrating cocok semua jenis kulit.",
-      emoji: "",
-      image: "/images/Cushion Foundation Pro.jpg",
-      badge: "New",
-    },
-    {
-      id: 4,
-      name: "Volume Lift Mascara",
-      brand: "GLŌW Eyes",
-      price: "Rp 95.000",
-      desc: "Mascara volumizing dengan sikat serat ganda untuk bulu mata lebih tebal.",
-      emoji: "",
-      image: "/images/Volume Lift Mascara.jpg",
-      badge: null,
-    },
-    {
-      id: 5,
-      name: "Satin Blush Stick",
-      brand: "GLŌW Cheeks",
-      price: "Rp 110.000",
-      desc: "Blush stick mudah di-blend, formula creamy dengan tampilan satin glowing.",
-      emoji: "",
-      image: "/images/Satin Blush Stick.jpg",
-      badge: "Bestseller",
-    },
-    {
-      id: 6,
-      name: "Microblading Brow Pen",
-      brand: "GLŌW Brows",
-      price: "Rp 125.000",
-      desc: "Pulpen alis presisi tip ultra-fine, efek rambut seperti microblading asli.",
-      emoji: "",
-      image: "/images/Microblading Brow Pen.jpg",
-      badge: "Hot",
-    },
-    {
-      id: 7,
-      name: "HD Concealer Wand",
-      brand: "GLŌW Base",
-      price: "Rp 88.000",
-      desc: "Concealer full coverage untuk dark circle dan blemish, tahan 12 jam.",
-      emoji: "",
-      image: "/images/HD Concealer Wand.jpg",
-      badge: null,
-    },
-    {
-      id: 8,
-      name: "Dewy Fix Setting Spray",
-      brand: "GLŌW Finish",
-      price: "Rp 79.000",
-      desc: "Setting spray hyaluronic acid untuk makeup tahan lama & dewy finish.",
-      emoji: "",
-      image: "/images/Dewy Fix Setting Spray.jpg",
-      badge: null,
-    },
-  ],
-  skincare: [
-    {
-      id: 1,
-      name: "Hydrating Foam Cleanser",
-      brand: "GLŌW Cleanse",
-      price: "Rp 98.000",
-      desc: "Pembersih wajah berbusa lembut dengan ceramide, menjaga barrier kulit.",
-      emoji: "",
-      image: "/images/Hydrating Foam Cleanser.jpg",
-      badge: "Bestseller",
-    },
-    {
-      id: 2,
-      name: "Niacinamide Serum",
-      brand: "GLŌW Serum",
-      price: "Rp 125.000",
-      desc: "Serum niacinamide tinggi untuk mengecilkan pori, mencerahkan, atasi noda.",
-      emoji: "",
-      image: "/images/Niacinamide Serum.jpg",
-      badge: "Hot",
-    },
-    {
-      id: 3,
-      name: "Vitamin C Serum",
-      brand: "GLŌW Serum",
-      price: "Rp 148.000",
-      desc: "Serum vitamin C stabil dengan ferulic acid untuk kulit cerah dan antioksidan.",
-      emoji: "",
-      image: "/images/Vitamin C Serum.jpg",
-      badge: "Bestseller",
-    },
-    {
-      id: 4,
-      name: "Retinol Night Serum",
-      brand: "GLŌW Serum",
-      price: "Rp 178.000",
-      desc: "Serum retinol konsentrasi pemula, regenerasi sel, anti-aging efektif.",
-      emoji: "",
-      image: "/images/Retinol Night Serum.jpg",
-      badge: null,
-    },
-    {
-      id: 5,
-      name: "Hyaluronic Acid Toner",
-      brand: "GLŌW Tone",
-      price: "Rp 88.000",
-      desc: "Toner hidrasi berlapis 3 jenis hyaluronic acid, meresap cepat tanpa lengket.",
-      emoji: "",
-      image: "/images/HyaluronicAcidToner.jpg",
-      badge: null,
-    },
-    {
-      id: 6,
-      name: "Ceramide Barrier Cream",
-      brand: "GLŌW Moisturize",
-      price: "Rp 135.000",
-      desc: "Pelembap rich ceramide, cholesterol, fatty acid untuk perkuat skin barrier.",
-      emoji: "",
-      image: "/images/Ceramide Barrier Cream.jpg",
-      badge: "New",
-    },
-    {
-      id: 7,
-      name: "Airy Sunscreen SPF50+",
-      brand: "GLŌW Protect",
-      price: "Rp 115.000",
-      desc: "Tabir surya ultra-ringan SPF50 PA++++, tanpa white cast, cocok berminyak.",
-      emoji: "",
-      image: "/images/Airy Sunscreen SPF50+.jpg",
-      badge: "Bestseller",
-    },
-    {
-      id: 8,
-      name: "Aloe Vera Soothing Serum",
-      brand: "GLŌW Serum",
-      price: "Rp 92.000",
-      desc: "Serum menenangkan 95% aloe vera untuk kulit kemerahan dan sensitif.",
-      emoji: "",
-      image: "/images/Aloe Vera Soothing Serum.jpg",
-      badge: null,
-    },
-  ],
-  alat: [
-    {
-      id: 1,
-      name: "Pro Brush Set 12pcs",
-      brand: "GLŌW Tools",
-      price: "Rp 285.000",
-      desc: "Set kuas profesional 12 buah untuk face, eye, dan lip. Bulu sintetis halus.",
-      emoji: "",
-      image: "/images/Pro Brush Set 12pcs.jpg",
-      badge: "Bestseller",
-    },
-    {
-      id: 2,
-      name: "Beauty Blender Pro",
-      brand: "GLŌW Tools",
-      price: "Rp 95.000",
-      desc: "Spons beauty blender berbentuk telur material lembut untuk blending flawless.",
-      emoji: "",
-      image: "/images/Beauty Blender Pro.jpg",
-      badge: null,
-    },
-    {
-      id: 3,
-      name: "Rose Quartz Facial Roller",
-      brand: "GLŌW Tools",
-      price: "Rp 178.000",
-      desc: "Roller wajah rose quartz untuk lymphatic drainage dan kurangi puffiness.",
-      emoji: "",
-      image: "/images/Rose Quartz Facial Roller.jpg",
-      badge: "Hot",
-    },
-    {
-      id: 4,
-      name: "Jade Gua Sha Stone",
-      brand: "GLŌW Tools",
-      price: "Rp 155.000",
-      desc: "Gua sha batu jade asli berbentuk heart untuk sculpting dan relaksasi otot.",
-      emoji: "",
-      image: "/images/Jade Gua Sha Stone.jpg",
-      badge: null,
-    },
-    {
-      id: 5,
-      name: "LED Face Mask 7-Color",
-      brand: "GLŌW Tech",
-      price: "Rp 650.000",
-      desc: "Masker LED 7 warna terapi cahaya untuk jerawat, anti-aging, mencerahkan.",
-      emoji: "",
-      image: "/images/LED Face Mask 7-Color.jpg",
-      badge: "New",
-    },
-    {
-      id: 6,
-      name: "EMS Microcurrent Lifter",
-      brand: "GLŌW Tech",
-      price: "Rp 475.000",
-      desc: "Alat mikrocurrent EMS lifting wajah, mengencangkan otot dan sirkulasi.",
-      emoji: "",
-      image: "/images/EMS Microcurrent Lifter.jpg",
-      badge: "Hot",
-    },
-    {
-      id: 7,
-      name: "Nano Mist Sprayer",
-      brand: "GLŌW Tech",
-      price: "Rp 245.000",
-      desc: "Semprotan nano mist untuk hidrasi kulit instan selama skincare & makeup.",
-      emoji: "",
-      image: "/images/Nano Mist Sprayer.jpg",
-      badge: null,
-    },
-    {
-      id: 8,
-      name: "Blackhead Suction Tool",
-      brand: "GLŌW Tools",
-      price: "Rp 185.000",
-      desc: "Alat suction vakum 4 ujung berbeda untuk membersihkan pori dan komedo.",
-      emoji: "",
-      image: "/images/Blackhead Suction Tool.jpg",
-      badge: null,
-    },
-  ],
 };
 
 // ===================== BADGE STYLE =====================
@@ -397,6 +148,53 @@ function CategorySection({ label, emoji, products, search }) {
 export default function KatalogProduk() {
   const [tab, setTab] = useState("all");
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Semua produk dari backend (tabel `product`), dikelompokkan per category:
+  // 'makeup' | 'skincare' | 'alat'
+  const [productsDb, setProductsDb] = useState({ makeup: [], skincare: [], alat: [] });
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function fetchProducts() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await api.get('/products');
+        const rows = res.data || [];
+
+        const normalized = rows.map(p => ({
+          id: p.id,
+          name: p.title,
+          brand: p.brand,
+          price: p.price,
+          desc: p.description,
+          emoji: p.emoji || "",
+          image: p.image,
+          badge: p.badge,
+          category: p.category,
+        }));
+
+        const grouped = {
+          makeup: normalized.filter(p => p.category === 'makeup'),
+          skincare: normalized.filter(p => p.category === 'skincare'),
+          alat: normalized.filter(p => p.category === 'alat'),
+        };
+
+        if (mounted) setProductsDb(grouped);
+      } catch (err) {
+        console.error('Gagal memuat katalog produk:', err);
+        if (mounted) setError('Gagal memuat data katalog produk. Pastikan backend berjalan.');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
+    fetchProducts();
+    return () => { mounted = false; };
+  }, []);
 
   const tabs = [
     { key: "all",      label: "Semua"       },
@@ -492,20 +290,26 @@ export default function KatalogProduk() {
           </div>
         </div>
 
-        {/* PRODUCT SECTIONS */}
-        {categories.map((cat, idx) => showCat(cat.key) && (
-          <div key={cat.key}>
-            <CategorySection
-              label={cat.label}
-              emoji={cat.emoji}
-              products={PRODUCTS_DB[cat.key]}
-              search={search}
-            />
-            {tab === "all" && idx < categories.length - 1 && (
-              <hr style={{ borderColor: C.soft, marginBottom: "3rem" }} />
-            )}
-          </div>
-        ))}
+        {loading ? (
+          <p style={{ color: C.muted, fontStyle: "italic" }}>Memuat katalog produk...</p>
+        ) : error ? (
+          <p style={{ color: "#c62828" }}>{error}</p>
+        ) : (
+          /* PRODUCT SECTIONS */
+          categories.map((cat, idx) => showCat(cat.key) && (
+            <div key={cat.key}>
+              <CategorySection
+                label={cat.label}
+                emoji={cat.emoji}
+                products={productsDb[cat.key]}
+                search={search}
+              />
+              {tab === "all" && idx < categories.length - 1 && (
+                <hr style={{ borderColor: C.soft, marginBottom: "3rem" }} />
+              )}
+            </div>
+          ))
+        )}
 
       </div>
     </div>

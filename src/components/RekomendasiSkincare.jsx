@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import api from '../api'
 
 function RekomendasiSkincare() {
   const [products, setProducts] = useState([])
@@ -11,15 +11,10 @@ function RekomendasiSkincare() {
     setLoading(true)
     setError(null)
     try {
-      const res = await axios.get('https://jsonplaceholder.typicode.com/photos?_limit=20')
-      const localData = await import('../data/products.json')
-      const skincare = localData.default
+            const res = await api.get('/products')
+      const skincare = res.data
         .filter(p => p.category === 'skincare')
         .slice(0, 6)
-        .map((p, i) => ({
-          ...p,
-          apiId: res.data[i]?.id, 
-        }))
       setProducts(skincare)
     } catch (err) {
       setError('Gagal memuat produk.')
@@ -64,34 +59,42 @@ function RekomendasiSkincare() {
 
         {!loading && !error && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
-            {products.map(product => (
-              <div
-                key={product.id}
-                style={{ background: '#fdf6f0', border: '1px solid #e8c5b5', borderRadius: 4, overflow: 'hidden', transition: 'transform 0.25s, box-shadow 0.25s', cursor: 'pointer' }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 16px 40px rgba(107,62,46,0.13)' }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
-              >
-                <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f3e8e0', padding: '1rem' }}>
-                  <img src={product.image} alt={product.title} style={{ maxHeight: 160, maxWidth: '100%', objectFit: 'contain' }} />
-                </div>
-                <div style={{ padding: '1.5rem' }}>
-                  <p style={{ fontSize: '0.65rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#d4876b', marginBottom: 4 }}>{product.subcategory}</p>
-                  <h5 style={{ fontFamily: 'Georgia, serif', fontSize: '1rem', color: '#6b3e2e', lineHeight: 1.4, marginBottom: '0.5rem' }}>
-                    {product.title.length > 45 ? product.title.slice(0, 45) + '…' : product.title}
-                  </h5>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ color: '#f0a500', fontSize: '0.8rem' }}>
-                      {'★'.repeat(Math.round(product.rating.rate))}
-                      {'☆'.repeat(5 - Math.round(product.rating.rate))}
-                      <span style={{ color: '#9b7e70', marginLeft: 4, fontSize: '0.72rem' }}>({product.rating.count})</span>
-                    </span>
-                    <span style={{ fontSize: '0.72rem', background: '#f3e8e0', color: '#6b3e2e', padding: '4px 10px', borderRadius: 20 }}>
-                      {getRecommendationTag(product.rating.rate)}
-                    </span>
+            {products.map(product => {
+              // Backend balikin field FLAT: product.rate & product.count
+              // (bukan nested product.rating.rate), dengan fallback 0 kalau
+              // produk belum punya review sama sekali (LEFT JOIN -> NULL)
+              const rate = Number(product.rate) || 0
+              const count = product.count || 0
+
+              return (
+                <div
+                  key={product.id}
+                  style={{ background: '#fdf6f0', border: '1px solid #e8c5b5', borderRadius: 4, overflow: 'hidden', transition: 'transform 0.25s, box-shadow 0.25s', cursor: 'pointer' }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 16px 40px rgba(107,62,46,0.13)' }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
+                >
+                  <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f3e8e0', padding: '1rem' }}>
+                    <img src={product.image} alt={product.title} style={{ maxHeight: 160, maxWidth: '100%', objectFit: 'contain' }} />
+                  </div>
+                  <div style={{ padding: '1.5rem' }}>
+                    <p style={{ fontSize: '0.65rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#d4876b', marginBottom: 4 }}>{product.subcategory}</p>
+                    <h5 style={{ fontFamily: 'Georgia, serif', fontSize: '1rem', color: '#6b3e2e', lineHeight: 1.4, marginBottom: '0.5rem' }}>
+                      {product.title.length > 45 ? product.title.slice(0, 45) + '…' : product.title}
+                    </h5>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: '#f0a500', fontSize: '0.8rem' }}>
+                        {'★'.repeat(Math.round(rate))}
+                        {'☆'.repeat(5 - Math.round(rate))}
+                        <span style={{ color: '#9b7e70', marginLeft: 4, fontSize: '0.72rem' }}>({count})</span>
+                      </span>
+                      <span style={{ fontSize: '0.72rem', background: '#f3e8e0', color: '#6b3e2e', padding: '4px 10px', borderRadius: 20 }}>
+                        {getRecommendationTag(rate)}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { Container, Row, Col, Card } from 'react-bootstrap';
-import { allProducts } from '../Data';
 
 // Mapping type produk ke kategori besar
 const FACE_TYPES = ["Skin Tint","Concealer","Setting Spray","Foundation","Countur","Highlighter","Bronzer","Face Mist","Cushion","Cream Blush","Liquid Blush Pink"];
@@ -15,43 +14,59 @@ const CATEGORIES = [
   { key: 'Lips',  icon: '💋', label: 'Lips' },
 ];
 
-function getFilteredProducts(activeKey) {
-  if (activeKey === 'Semua') return allProducts;
-  if (activeKey === 'Face')  return allProducts.filter(p => FACE_TYPES.includes(p.type));
-  if (activeKey === 'Eyes')  return allProducts.filter(p => EYES_TYPES.includes(p.type));
-  if (activeKey === 'Lips')  return allProducts.filter(p => LIPS_TYPES.includes(p.type));
-  return allProducts;
-}
-
 function Makeup() {
   const [activeType, setActiveType] = useState('Semua');
   const [activeSubType, setActiveSubType] = useState('Semua');
   const [loading, setLoading]       = useState(true);
+  const [error, setError]           = useState(null);
+  const [products, setProducts]     = useState([]);       // dari GET /api/makeup (tabel makeup_product)
   const [apiCategories, setApiCategories] = useState([]);
 
-  // Semua type unik dari allProducts
-  const allTypes = ['Semua', ...new Set(allProducts.map(p => p.type))];
-
   useEffect(() => {
-    // Mengambil data dari Public API JSONPlaceholder /albums (minimal 10 item)
-    // Id dari API digunakan sebagai key unik untuk tiap kategori badge
-    axios.get('https://jsonplaceholder.typicode.com/albums?_limit=10')
-      .then((res) => {
+    let mounted = true;
+
+    async function fetchProducts() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await api.get('/makeup');
+        const rows = res.data?.data || [];
+
+        if (!mounted) return;
+        setProducts(rows);
+
+        // id dari API dipakai sebagai key unik untuk tiap kategori badge
         const cats = CATEGORIES.map((cat, i) => ({
-          id:    res.data[i].id, // id dari API
+          id:    rows[i]?.id ?? i, // fallback ke index kalau data kurang
           key:   cat.key,
           icon:  cat.icon,
           label: cat.label,
         }));
         setApiCategories(cats);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error('Makeup API error:', err);
+        setError('Gagal memuat data produk makeup. Pastikan backend berjalan.');
         // Fallback tanpa id API
         setApiCategories(CATEGORIES.map((cat, i) => ({ id: i, ...cat })));
-      })
-      .finally(() => setLoading(false));
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
+    fetchProducts();
+    return () => { mounted = false; };
   }, []);
+
+  function getFilteredProducts(activeKey) {
+    if (activeKey === 'Semua') return products;
+    if (activeKey === 'Face')  return products.filter(p => FACE_TYPES.includes(p.type));
+    if (activeKey === 'Eyes')  return products.filter(p => EYES_TYPES.includes(p.type));
+    if (activeKey === 'Lips')  return products.filter(p => LIPS_TYPES.includes(p.type));
+    return products;
+  }
+
+  // Semua type unik dari products
+  const allTypes = ['Semua', ...new Set(products.map(p => p.type))];
 
   // Filter: pertama badge kategori, lalu pill per type
   let filteredProducts = getFilteredProducts(activeType);
@@ -77,6 +92,16 @@ function Makeup() {
             <p style={{ color: '#9b7e70', marginTop: '1rem' }}>Memuat data produk makeup...</p>
             <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
           </div>
+        </Container>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="py-5" style={{ backgroundColor: '#fffbf2', minHeight: '100vh' }}>
+        <Container>
+          <p className="text-center text-muted">{error}</p>
         </Container>
       </main>
     );

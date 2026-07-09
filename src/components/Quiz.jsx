@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {useNavigate} from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 
 const Quiz = ({ goTo }) => {
   const [questions, setQuestions] = useState([]);
@@ -9,64 +9,34 @@ const Quiz = ({ goTo }) => {
   const navigate = useNavigate();
   const [showResult, setShowResult] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+  const [loadError, setLoadError] = useState(false); // <-- BARU: nandain fetch gagal
+
   // State interaksi
   const [selectedOpt, setSelectedOpt] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
 
   useEffect(() => {
-    // Mengambil minimal 10 item dari Public API menggunakan Axios
-    axios.get('https://jsonplaceholder.typicode.com/posts?_limit=10')
+    api.get('/quiz')
       .then((res) => {
         const data = res.data;
-        const skincareQuestions = [
-          {
-            "id": data[0].id,
-            "text": "Bagaimana kondisi kulitmu di siang hari (tanpa skincare)?",
-            "opts": [
-              { "label": "Terasa ketat dan kering", "val": "kering" },
-              { "label": "Sangat berminyak di semua area", "val": "berminyak" },
-              { "label": "Berminyak di T-zone, normal di pipi", "val": "kombinasi" },
-              { "label": "Mudah kemerahan dan gatal", "val": "sensitif" }
-            ]
-          },
-          {
-            "id": data[1].id,
-            "text": "Bagaimana tampilan pori-pori wajahmu?",
-            "opts": [
-              { "label": "Hampir tidak terlihat", "val": "kering" },
-              { "label": "Besar dan terlihat jelas", "val": "berminyak" },
-              { "label": "Besar di T-zone, kecil di pipi", "val": "kombinasi" },
-              { "label": "Normal tapi sering kemerahan", "val": "sensitif" }
-            ]
-          },
-          {
-            "id": data[2].id,
-            "text": "Apa yang terjadi setelah kamu mencuci muka?",
-            "opts": [
-              { "label": "Terasa sangat ketat dan kasar", "val": "kering" },
-              { "label": "Cepat berminyak dalam 30 menit", "val": "berminyak" },
-              { "label": "Ketat di T-zone, kenyal di pipi", "val": "kombinasi" },
-              { "label": "Kadang merah atau terasa perih", "val": "sensitif" }
-            ]
-          },
-          {
-            "id": data[3].id,
-            "text": "Seberapa sering kulitmu berjerawat atau bermasalah?",
-            "opts": [
-              { "label": "Jarang, tapi sering mengelupas", "val": "kering" },
-              { "label": "Sering, terutama komedo & jerawat", "val": "berminyak" },
-              { "label": "Kadang di zona T saja", "val": "kombinasi" },
-              { "label": "Mudah reaksi dengan produk baru", "val": "sensitif" }
-            ]
-          }
-        ];
-        
-        setQuestions(skincareQuestions);
+
+        // Guard: kalau backend nyala tapi tabel quiz_question masih kosong/kurang dari 4,
+        // atau ada pertanyaan yang opsinya kosong (quiz_options belum keisi)
+        const valid = data && data.length >= 4 && data.every((q) => q.opts && q.opts.length > 0);
+        if (!valid) {
+          setLoadError(true);
+          setLoading(false);
+          return;
+        }
+
+        // Backend sudah mengembalikan { id, text, order, opts: [{ id, label, val }] }
+        // langsung dari tabel quiz_question + quiz_options, tidak perlu hardcode lagi.
+        setQuestions(data);
         setLoading(false);
       })
       .catch((err) => {
-        console.error('Gagal memuat kuis dari JSONPlaceholder:', err);
+        console.error('Gagal memuat kuis dari backend:', err);
+        setLoadError(true);   // <-- BARU: tandai gagal, bukan cuma log doang
         setLoading(false);
       });
   }, []);
@@ -121,6 +91,25 @@ const Quiz = ({ goTo }) => {
       <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
     </div>
   );
+
+  // --- BARU: TAMPILAN KALAU GAGAL FETCH / DATA KOSONG (ganti crash jadi pesan error) ---
+  if (loadError || questions.length === 0) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', flexDirection: 'column', gap: '16px', padding: '20px', textAlign: 'center' }}>
+        <div style={{ fontSize: '48px' }}>⚠️</div>
+        <h2 style={{ color: 'var(--pink-deep)', margin: 0 }}>Gagal memuat pertanyaan kuis</h2>
+        <p style={{ color: 'var(--text-muted)', maxWidth: '400px' }}>
+          Pastikan backend (server.js) sudah dijalankan di <code>http://localhost:5000</code> dan tabel <code>quiz_question</code> sudah terisi minimal 4 baris.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          style={{ padding: '14px 28px', borderRadius: '16px', border: 'none', background: 'var(--pink-deep)', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+        >
+          Coba Lagi
+        </button>
+      </div>
+    );
+  }
 
   // --- TAMPILAN HASIL ---
   if (showResult) {

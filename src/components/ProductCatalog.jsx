@@ -1,26 +1,67 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Accordion, Card, Button } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
-import { allProducts, makeupData } from '../Data'; 
+import api from '../api';
 
 function ProductCatalog() {
-  const { categoryName } = useParams(); 
+  const { categoryName } = useParams();
   const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [looksData, setLooksData] = useState([]);   // setara makeupData: [{ id, title, categories: [{name, items}] }]
+  const [allProducts, setAllProducts] = useState([]); // dari GET /api/makeup
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function fetchData() {
+      setLoading(true);
+      setError(null);
+      try {
+        // 1. Ambil daftar semua look
+        const looksRes = await api.get('/looks');
+        const looks = looksRes.data?.data || [];
+
+        // 2. Ambil detail tiap look (berisi categories) secara paralel
+        const detailResults = await Promise.all(
+          looks.map(l => api.get(`/looks/${l.id}`).then(r => r.data?.data).catch(() => null))
+        );
+        const fullLooks = detailResults.filter(Boolean);
+
+        // 3. Ambil semua produk makeup (tabel makeup_product)
+        const makeupRes = await api.get('/makeup');
+        const products = makeupRes.data?.data || [];
+
+        if (!mounted) return;
+        setLooksData(fullLooks);
+        setAllProducts(products);
+      } catch (err) {
+        console.error('Gagal memuat data katalog produk makeup:', err);
+        if (mounted) setError('Gagal memuat data. Pastikan backend berjalan.');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
+    fetchData();
+    return () => { mounted = false; };
+  }, []);
 
   const currentCategory = categoryName ? categoryName.toLowerCase().trim() : "";
 
   // 1. Cari Look/Inspirasi mana yang memiliki sub-produk ini (Abaikan huruf besar/kecil & spasi)
-  const activeLook = makeupData.find(look => 
-    look.categories.some(cat => 
+  const activeLook = looksData.find(look =>
+    look.categories.some(cat =>
       cat.items.some(item => item.toLowerCase().trim() === currentCategory)
     )
   );
 
   // 2. Cari tahu indeks kategori mana yang sedang aktif untuk membuka Accordion secara otomatis
-  const activeCategoryIndex = activeLook 
-    ? activeLook.categories.findIndex(cat => 
+  const activeCategoryIndex = activeLook
+    ? activeLook.categories.findIndex(cat =>
         cat.items.some(item => item.toLowerCase().trim() === currentCategory)
-      ) 
+      )
     : 0;
 
   // 3. Filter produk untuk sisi kanan sesuai type yang aktif
@@ -28,6 +69,34 @@ function ProductCatalog() {
     if (!p.type) return false;
     return p.type.toLowerCase().trim() === currentCategory;
   });
+
+  if (loading) {
+    return (
+      <main className="py-5" style={{ backgroundColor: '#fffbf2', minHeight: '100vh' }}>
+        <Container>
+          <div className="text-center py-5">
+            <div style={{
+              display: 'inline-block', width: 40, height: 40,
+              border: '3px solid #fbcad9', borderTop: '3px solid #c3073f',
+              borderRadius: '50%', animation: 'spin 0.8s linear infinite'
+            }} />
+            <p style={{ color: '#9b7e70', marginTop: '1rem' }}>Memuat data produk...</p>
+            <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+          </div>
+        </Container>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="py-5" style={{ backgroundColor: '#fffbf2', minHeight: '100vh' }}>
+        <Container>
+          <p className="text-center text-muted">{error}</p>
+        </Container>
+      </main>
+    );
+  }
 
   return (
     <main className="py-5" style={{ backgroundColor: '#fffbf2', minHeight: '100vh' }}>

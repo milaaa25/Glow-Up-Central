@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import api from '../api'
 
 
 const TEAM_DATA = [
@@ -17,16 +17,17 @@ function Tim() {
 
   useEffect(() => {
     
-    axios.get('https://jsonplaceholder.typicode.com/users?_limit=10')
+    api.get('/team')
       .then((res) => {
-        const users = res.data
-       
-        const merged = TEAM_DATA.map((member, i) => ({
-          ...member,
-          email: users[i]?.email || '-',
-          city:  users[i]?.address?.city || 'Indonesia',
+        const members = res.data?.data || []
+        const mapped = members.map((m) => ({
+          name:  m.name,
+          role:  m.role,
+          pages: m.pages,
+          photo: m.photo,
+          city:  m.city || 'Indonesia',
         }))
-        setTeam(merged)
+        setTeam(mapped.length > 0 ? mapped : TEAM_DATA)
       })
       .catch((err) => {
         console.error('Tim API error:', err)
@@ -69,8 +70,7 @@ function Tim() {
               />
               <h5 style={{ fontFamily: 'Georgia, serif', fontSize: '1.2rem', color: '#6b3e2e', marginBottom: '0.3rem' }}>{m.name}</h5>
               <p style={{ fontSize: '0.78rem', color: '#9b7e70', marginBottom: '0.3rem' }}>{m.role}</p>
-              <p style={{ fontSize: '0.72rem', color: '#d4876b', marginBottom: '0.3rem' }}>{m.pages}</p>
-              <p style={{ fontSize: '0.68rem', color: '#b0908a', marginBottom: 0 }}>📍 {m.city}</p>
+              <p style={{ fontSize: '0.72rem', color: '#d4876b', marginBottom: 0 }}>{m.pages}</p>
             </div>
           ))}
         </div>

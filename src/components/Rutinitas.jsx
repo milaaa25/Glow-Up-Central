@@ -1,9 +1,78 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../api';
 import './Rutinitas.css';
 
-const Rutinitas = ({ goTo }) => {
+const SKIN_TYPES = [
+  { id: 'kering',    label: 'Kulit Kering' },
+  { id: 'berminyak', label: 'Kulit Berminyak' },
+  { id: 'kombinasi', label: 'Kulit Kombinasi' },
+  { id: 'sensitif',  label: 'Kulit Sensitif' },
+];
+
+// Mapping product_category (dari tabel skin_routine) ke gambar & emoji yang sudah ada di /public/images
+const CATEGORY_VISUAL = {
+  'Cleanser':        { img: 'images/cucimuka.jpeg',   icon: '🧼' },
+  'Double Cleansing':{ img: 'images/cleansing.jpeg',  icon: '🧴' },
+  'Toner':           { img: 'images/toner.jpeg',      icon: '💦' },
+  'Serum':           { img: 'images/serum1.jpeg',     icon: '💧' },
+  'Moisturizer':      { img: 'images/pelembab.jpeg',  icon: '🧈' },
+  'Sunscreen':       { img: 'images/ss30.jpeg',       icon: '☀️' },
+  'Sleeping Mask':   { img: 'images/sleepingMask.jpeg', icon: '🌙' },
+  'Patch Test':      { img: 'images/WajibPatch.jpeg', icon: '🧪' },
+};
+
+function stepVisual(category, timeOfDay) {
+  if (category === 'Moisturizer' && timeOfDay === 'malam') {
+    return { img: 'images/moistMalem.jpeg', icon: '🧈' };
+  }
+  return CATEGORY_VISUAL[category] || { img: null, icon: '✨' };
+}
+
+const Rutinitas = () => {
   const navigate = useNavigate();
+  const [skinType, setSkinType] = useState(() => localStorage.getItem('skinType') || 'kering');
+  const [routines, setRoutines] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    api.get('/rutinitas')
+      .then((res) => {
+        setRoutines(Array.isArray(res.data) ? res.data : []);
+      })
+      .catch((err) => {
+        console.error('Rutinitas API error:', err);
+        setError('Gagal memuat data rutinitas dari server. Pastikan backend sudah berjalan.');
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const pagiSteps = routines
+    .filter(r => r.skin_type_id === skinType && r.time_of_day === 'pagi')
+    .sort((a, b) => a.step_order - b.step_order);
+
+  const malamSteps = routines
+    .filter(r => r.skin_type_id === skinType && r.time_of_day === 'malam')
+    .sort((a, b) => a.step_order - b.step_order);
+
+  const renderStep = (step, timeOfDay) => {
+    const visual = stepVisual(step.product_category, timeOfDay);
+    return (
+      <div className="step" key={step.id}>
+        <div className="step-img">
+          {visual.img
+            ? <img src={visual.img} alt={step.product_category} />
+            : <span style={{ fontSize: '2rem' }}>{visual.icon}</span>}
+        </div>
+        <div className="step-body">
+          <div className="step-n">Step {String(step.step_order).padStart(2, '0')}</div>
+          <div className="step-name">{visual.icon} {step.product_category}</div>
+          <div className="step-desc">{step.description}</div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="page active" id="page-rutinitas">
@@ -14,125 +83,67 @@ const Rutinitas = ({ goTo }) => {
         <div className="rut-banner-text">
           <div className="rut-banner-tag">Daily Routine</div>
           <h1 className="rut-banner-title">Rutinitas <em>Skincare</em><br />Pagi &amp; Malam</h1>
-          <p className="rut-banner-sub">Kunci dari kulit glowing adalah konsistensi. Yuk, mulai biasakan step-step ini tiap pagi dan malam biar kulitmu makin sehat!</p>
+          <p className="rut-banner-sub">Kunci dari kulit glowing adalah konsistensi. Pilih jenis kulitmu, lalu ikuti step-step ini tiap pagi dan malam biar kulitmu makin sehat!</p>
         </div>
       </div>
 
-      <div className="split-panels">
-        {/* PAGI */}
-        <div className="panel pagi">
-          <div className="panel-head"><span className="icon">🌤️</span><h2>Rutinitas Pagi</h2></div>
-          <div className="steps">
-            <div className="step">
-              <div className="step-img s-p1">
-                <img src="images/cucimuka.jpeg" alt="Cuci Muka" />
-              </div>
-              <div className="step-body">
-                <div className="step-n">Step 01</div>
-                <div className="step-name">Cuci Muka</div>
-                <div className="step-desc">Bangun tidur wajib banget basuh muka pakai sabun yang super gentle biar sisa skincare semalaman dan sebum bersih total.</div>
-              </div>
-            </div>
-            <div className="step">
-              <div className="step-img s-p2">
-                <img src="images/toner.jpeg" alt="Toner" />
-              </div>
-              <div className="step-body">
-                <div className="step-n">Step 02</div>
-                <div className="step-name">Toner / Essence</div>
-                <div className="step-desc">Kembalikan pH kulitmu dan kasih hidrasi pertama. Tap-tap lembut pakai tangan aja udah cukup kok!</div>
-              </div>
-            </div>
-            <div className="step">
-              <div className="step-img s-p3">
-                <img src="images/serum2.jpeg" alt="Serum Vitamin C" />
-              </div>
-              <div className="step-body">
-                <div className="step-n">Step 03</div>
-                <div className="step-name">Serum Vitamin C</div>
-                <div className="step-desc">Senjata utama buat nangkis polusi seharian dan bikin wajah auto-cerah! Cukup 3-4 tetes aja udah cukup buat semuka.</div>
-              </div>
-            </div>
-            <div className="step">
-              <div className="step-img s-p4">
-                <img src="images/pelembab.jpeg" alt="pelembap" />
-              </div>
-              <div className="step-body">
-                <div className="step-n">Step 04</div>
-                <div className="step-name">Pelembap (Moisturizer)</div>
-                <div className="step-desc">Kunci semua hidrasinya biar nggak menguap. Pilih yang teksturnya ringan kalau kulitmu minyakan, atau yang rich kalau kulit kering.</div>
-              </div>
-            </div>
-            <div className="step">
-              <div className="step-img s-p5">
-                <img src="images/ss30.jpeg" alt="Sunscreen" />
-              </div>
-              <div className="step-body">
-                <div className="step-n">Step 05</div>
-                <div className="step-name">Sunscreen SPF 30+</div>
-                <div className="step-desc">Haram hukumnya di-skip! Ini tameng utamamu dari sinar UV yang bikin flek hitam dan penuaan dini. Pakai sebanyak dua jari ya!</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* MALAM */}
-        <div className="panel malam">
-          <div className="panel-head"><span className="icon">🌙</span><h2>Rutinitas Malam</h2></div>
-          <div className="steps">
-            <div className="step">
-              <div className="step-img s-m1">
-                <img src="images/cleansing.jpeg" alt="doublecleansing" />
-              </div>
-              <div className="step-body">
-                <div className="step-n">Step 01</div>
-                <div className="step-name">Double Cleansing</div>
-                <div className="step-desc">Satu sabun aja nggak cukup buat lunturin makeup dan polusi. Awali pakai cleansing balm/oil, baru lanjut cuci pakai facial wash.</div>
-              </div>
-            </div>
-            <div className="step">
-              <div className="step-img s-m2">
-                <img src="images/toner.jpeg" alt="essence" />
-              </div>
-              <div className="step-body">
-                <div className="step-n">Step 02</div>
-                <div className="step-name">Hydrating Toner</div>
-                <div className="step-desc">Siapkan 'jalan' buat skincare selanjutnya dengan hidrasi ekstra setelah double cleansing yang cukup menguras minyak alami wajah.</div>
-              </div>
-            </div>
-            <div className="step">
-              <div className="step-img s-m3">
-                <img src="images/serum1.jpeg" alt="treatmentserum" />
-              </div>
-              <div className="step-body">
-                <div className="step-n">Step 03</div>
-                <div className="step-name">Treatment Serum</div>
-                <div className="step-desc">Waktunya masukin bahan aktif! Bisa pakai Retinol (buat anti-aging), Salicylic Acid (jerawat), atau Niacinamide (kusam) sesuai masalah kulitmu.</div>
-              </div>
-            </div>
-            <div className="step">
-              <div className="step-img s-m4">
-                <img src="images/moistMalem.jpeg" alt="moisturizer" />
-              </div>
-              <div className="step-body">
-                <div className="step-n">Step 04</div>
-                <div className="step-name">Night Moisturizer</div>
-                <div className="step-desc">Tutup step skincare kamu pakai pelembap malam yang agak thick buat nutrisi maksimal saat sel kulit lagi beregenerasi.</div>
-              </div>
-            </div>
-            <div className="step">
-              <div className="step-img s-m5">
-                <img src="images/sleepingMask.jpeg" alt="Sleepingmask" />
-              </div>
-              <div className="step-body">
-                <div className="step-n">Step 05</div>
-                <div className="step-name">Sleeping Mask (Opsional)</div>
-                <div className="step-desc">Ngerasa kulit lagi kering banget? Tambahin sleeping mask sebagai garda terakhir, biarin semalaman, dan besok paginya bilas deh!</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Selector jenis kulit — data rutinitas di database memang dipecah per jenis kulit */}
+      <div className="skin-type-selector" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'center', margin: '2rem 0' }}>
+        {SKIN_TYPES.map(st => (
+          <button
+            key={st.id}
+            onClick={() => setSkinType(st.id)}
+            style={{
+              padding: '0.6rem 1.4rem',
+              borderRadius: 24,
+              border: skinType === st.id ? '2px solid #c9956e' : '1px solid #e8c5b5',
+              background: skinType === st.id ? '#c9956e' : '#fff',
+              color: skinType === st.id ? '#fff' : '#6b3e2e',
+              fontWeight: skinType === st.id ? 600 : 400,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            {st.label}
+          </button>
+        ))}
       </div>
+
+      {loading && (
+        <div style={{ textAlign: 'center', padding: '3rem', color: '#9b7e70' }}>
+          <div style={{ display: 'inline-block', width: 40, height: 40, border: '3px solid #e8c5b5', borderTop: '3px solid #c9956e', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          <p style={{ marginTop: '1rem' }}>Memuat rutinitas skincare...</p>
+          <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+        </div>
+      )}
+
+      {!loading && error && (
+        <div style={{ textAlign: 'center', padding: '2rem', color: '#c3073f' }}>{error}</div>
+      )}
+
+      {!loading && !error && (
+        <div className="split-panels">
+          {/* PAGI */}
+          <div className="panel pagi">
+            <div className="panel-head"><span className="icon">🌤️</span><h2>Rutinitas Pagi</h2></div>
+            <div className="steps">
+              {pagiSteps.length > 0
+                ? pagiSteps.map(s => renderStep(s, 'pagi'))
+                : <p className="text-muted">Belum ada data rutinitas pagi untuk jenis kulit ini.</p>}
+            </div>
+          </div>
+
+          {/* MALAM */}
+          <div className="panel malam">
+            <div className="panel-head"><span className="icon">🌙</span><h2>Rutinitas Malam</h2></div>
+            <div className="steps">
+              {malamSteps.length > 0
+                ? malamSteps.map(s => renderStep(s, 'malam'))
+                : <p className="text-muted">Belum ada data rutinitas malam untuk jenis kulit ini.</p>}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="tips-bar">
         <div className="tips-bar-head">Tips<br />Penting<br />yang <em>Wajib</em><br />Kamu Tahu</div>

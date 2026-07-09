@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaInstagram, FaTiktok, FaYoutube } from "react-icons/fa";
+import api from "../api";
 
 const C = {
   cream: "#fdf6f0", soft: "#f3e8e0", rose: "#e8c5b5",
@@ -12,30 +13,40 @@ const font = {
 };
 
 async function submitContactAPI(formData) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (Math.random() > 0.05) resolve({ success: true, message: "Pesan berhasil diterima!" });
-      else reject(new Error("Gagal mengirim pesan. Coba lagi."));
-    }, 1200);
-  });
+  try {
+    const res = await api.post('/contact', formData);
+    return res.data;
+  } catch (err) {
+    const backendMsg = err.response?.data?.message;
+    throw new Error(backendMsg || 'Gagal mengirim pesan. Coba lagi.');
+  }
 }
+
+// Fallback statis kalau backend/tabel faq belum bisa diakses
+const FAQ_FALLBACK = [
+  { id: 1, q: "Apakah produk GLŌW aman untuk kulit sensitif?",   a: "Ya! Semua produk yang kami rekomendasikan telah melalui seleksi ketat dengan mempertimbangkan kandungan yang aman untuk kulit sensitif. Namun kami tetap menyarankan patch test sebelum pemakaian penuh." },
+  { id: 2, q: "Berapa lama pengiriman produk?",                   a: "Pengiriman dalam kota 1-2 hari kerja, luar kota 3-5 hari kerja, dan luar pulau 5-7 hari kerja menggunakan layanan pengiriman terpercaya kami." },
+  { id: 3, q: "Apakah ada garansi untuk alat kecantikan?",        a: "Ya, semua alat kecantikan kategori Tech memiliki garansi resmi 1 tahun untuk kerusakan pabrik. Garansi tidak berlaku untuk kerusakan karena kesalahan pengguna." },
+];
 
 function useFAQAPI() {
   const [faqs, setFaqs] = useState([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setFaqs([
-        { id: 1, q: "Apakah produk GLŌW aman untuk kulit sensitif?",   a: "Ya! Semua produk yang kami rekomendasikan telah melalui seleksi ketat dengan mempertimbangkan kandungan yang aman untuk kulit sensitif. Namun kami tetap menyarankan patch test sebelum pemakaian penuh." },
-        { id: 2, q: "Berapa lama pengiriman produk?",                   a: "Pengiriman dalam kota 1-2 hari kerja, luar kota 3-5 hari kerja, dan luar pulau 5-7 hari kerja menggunakan layanan pengiriman terpercaya kami." },
-        { id: 3, q: "Apakah ada garansi untuk alat kecantikan?",        a: "Ya, semua alat kecantikan kategori Tech memiliki garansi resmi 1 tahun untuk kerusakan pabrik. Garansi tidak berlaku untuk kerusakan karena kesalahan pengguna." },
-        { id: 4, q: "Bagaimana cara mengembalikan produk?",             a: "Produk dapat dikembalikan dalam 7 hari setelah diterima jika masih tersegel dan belum dibuka. Hubungi tim kami melalui email atau WhatsApp untuk proses return." },
-        { id: 5, q: "Apakah GLŌW menerima endorse atau kerja sama?",   a: "Tentu! Kami terbuka untuk kolaborasi dengan influencer beauty, blogger, dan brand. Kirimkan proposal ke email partnership kami dengan subject 'Kolaborasi GLŌW'." },
-        { id: 6, q: "Produk mana yang cocok untuk kulit berminyak?",    a: "Untuk kulit berminyak kami rekomendasikan: Niacinamide 10% Serum, Airy Sunscreen SPF50+, dan Hyaluronic Acid Toner. Gunakan quiz jenis kulit kami untuk rekomendasi personal!" },
-      ]);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
+    api.get('/faq')
+      .then((res) => {
+        const rows = res.data?.data || [];
+        setFaqs(
+          rows.length > 0
+            ? rows.map((r) => ({ id: r.id, q: r.questions, a: r.answer }))
+            : FAQ_FALLBACK
+        );
+      })
+      .catch((err) => {
+        console.error('FAQ API error:', err);
+        setFaqs(FAQ_FALLBACK);
+      })
+      .finally(() => setLoading(false));
   }, []);
   return { faqs, loading };
 }
